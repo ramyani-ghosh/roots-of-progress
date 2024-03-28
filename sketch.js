@@ -1,21 +1,61 @@
+var heighthigh 
+var heightlow 
+var widthhigh
+var widthlow
+//color palettes = [ [darkblue, lightblue, lightgreen, yellow] , [purple, pink, orange, yellow] ]
+let color_palettes = [ [[30,56,90],[54,152,206],[132,162,70], [217,203,105]] , [[83, 43, 85],[215, 75, 118], [251, 109, 72], [255, 175, 69]] ]
+var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
+// Preload function to load external assets
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function preload() {
+  // Load the image
+  // treeImg = loadImage('tree-black.png');
+  
+  treeImg = loadImage('tree-model-1.png');
+  circleImg = loadImage('circlecanvas2.png');
+}
+console.log("color_palette");
+console.log(color_palette);
+
 // Class for a particle that moves based on a perlin noise flow field
-let r = 1;
-let g = 20;
-let b = 40;
+// ...
+
+// function setup() {
+//   // create a canvas with width 1450 and height 820
+//   createCanvas(950, 820);
+//   // ...
+// }
+let counter = 0;
+// Class for a particle that moves based on a perlin noise flow field
+let r = color_palette[0][0];
+let g = color_palette[0][1];
+let b = color_palette[0][2];
 class Particle {
     constructor() {
-      this.r = 1;
-      this.g = 20;
-      this.b = 40;
+      // this.r = 20;
+      // this.g = 60;
+      // this.b = 60;
+      this.r = 30;
+      this.g = 56;
+      this.b = 90;
       // Initial position of the particle at a random point on the canvas
       // this.pos = createVector(random(width), random(0,10));
-      this.pos = createVector(random(width/2-200,width/2+50), random(height/2-50,height/2+50));
+      // this.pos = createVector(random(width/2-50,width/2+50), random(10,50));
+      heighthigh = height/2+170;
+      heightlow =  height/2+300;
+      widthhigh = width/2+60;
+      widthlow = width/2+50;
+      this.pos = createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
       // Initial velocity set to (0, 0)
       this.vel = createVector(0, 0);
       // Initial acceleration set to (0, 0)
       this.accel = createVector(0, 0);
       // Maximum speed that the particle can move
-      this.maxV = 4;
+      this.maxV = 5.5;
       // Store the previous position of the particle
       this.prevPos = this.pos.copy();
     }
@@ -50,47 +90,26 @@ class Particle {
       stroke(r, g, b);
 
       //teal
-      if (g%2==0)
+      // if (g%2==0)
+      // {
+      //   b-=0.10012;
+      //   g-=0.102;
+      //   r-=0.104;
+      // }
+      // else{
+      //   b+=0.0001;
+      //   g+=0.00005;
+      //   r+=0.00008;
+      // }  
+
+      if ( b<200 && r<200 && g<200)
       {
-        b-=1.001;
-        g-=1.02;
-        r-=1;
-      }
-   
-      else{
         b+=0.001;
-        g+=0.0005;
+        g+=0.001;
         r+=0.001;
       }
-
-      //orange
-      // if (this.g%10==0)
-      // {
-      //   this.b-=1;
-      //   this.g-=1;
-      //   this.r-=1;
-      // }
-   
-      // else{
-      //   this.b+=0.2;
-      //   this.g+=0.8;
-      //   this.r+=1.2;
-      // }
-
-      //pink
-      // if (this.g%20==0)
-      // {
-      //   this.b-=2;
-      //   this.g-=2;
-      //   this.r-=2;
-      // }
-      // else{
-      //   this.b+=3;
-      //   this.g+=1;
-      //   this.r+=3;
-      // }
-     
-      strokeWeight(1);
+       
+      strokeWeight(0.4);
       line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
       this.updatePrev();
     }
@@ -100,41 +119,46 @@ class Particle {
       this.prevPos.x = this.pos.x;
       this.prevPos.y = this.pos.y;
     }
-  
+   
     // Check if the particle has gone outside the canvas and wrap it around if necessary
     particleReset() {
-      if (this.pos.x > width) {
-        this.pos.x = 0;
+      let rightend = 1185
+      let leftend = 310
+      let topend = 30
+      let bottomend = height-30
+      if (this.pos.x >= rightend) {
+        this.pos.x = leftend;
         this.updatePrev();
       }
-      if (this.pos.x < 0) {
-        this.pos.x = width;
+      if (this.pos.x < leftend) {
+        this.pos.x = rightend;
         this.updatePrev();
       }
-      if (this.pos.y > height) {
-        this.pos.y = 0;
+      if (this.pos.y >= bottomend) {
+        this.pos.y = topend;
         this.updatePrev();
       }
-      if (this.pos.y < 0) {
-        this.pos.y = height;
+      if (this.pos.y < topend) {
+        this.pos.y = bottomend;
         this.updatePrev();
       }
     }
+
   }
   
   // Increment for the perlin noise
   let inc = 0.1;
   
   // Increment for z_off
-  let z_inc = 0.0001;
+  let z_inc = 0.0005;
   
   // Scale of the flow field grid
-  let s = 60;
+  let s = 80;
   // Number of columns and rows in the flow field grid
   let cols, rows;
   
   // z_off variable is used for controlling the noise function
-  let z_off = 6;
+  let z_off = 5;
   
   // fr variable is used for creating a paragraph element
   // let fr;
@@ -149,12 +173,13 @@ class Particle {
   let reset = 0;
   
   // total number of times the program runs before resetting background
-  let resetTimes = 800;
+  let resetTimes = 200000;
   
   // setup function is called once when the sketch starts
   function setup() {
     // create a canvas with width 600 and height 400
-    createCanvas(1400, 800);
+    w = document.body.scrollWidthl
+    createCanvas(1450, 920);
   
     // calculate the number of columns and rows in the canvas
     cols = floor(width / s);
@@ -164,7 +189,7 @@ class Particle {
     flowfield = new Array(cols * rows);
   
     // create 300 Particle objects and store them in the particles array
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 100; i++) {
       particles[i] = new Particle();
     }
   
@@ -173,21 +198,14 @@ class Particle {
   }
   
   // draw function is called repeatedly until the sketch stops
-  function draw() {
+  function draw() {    
+
+    // image(circleImg, width/2 - 890, height/2 - 420, 1650, 1020);
     frameRate(30);
     // increment the reset variable
     reset++;
-  
-  
-    // if the reset variable exceeds 500, reset the background to black
-    if (reset > resetTimes) {
-      // background(0);
-      reset = 0;  
-        r = 40;
-        g = 30;
-        b = 1;
-    }
-  
+    // translate(width / 2, height / 2);
+
     // y_off variable is used for controlling the noise function
     let y_off = 0;
   
@@ -213,8 +231,6 @@ class Particle {
         // increment the x_off variable
         x_off += inc;
   
-        // set the stroke color to gray
-        stroke(0, 20);
       }
   
       // increment the y_off variable
@@ -238,5 +254,65 @@ class Particle {
       // Call the display function to display the particle on the canvas.
       particles[i].display();
     }
+    image(treeImg, width/2 - 230, height/2 - 300, 550, 700);
+    image(circleImg, width/2 - 790, height/2 - 440, 1650, 1020);
   }
-  
+
+// Function to handle mouse click event
+function mousePressed() {
+    // Reset the background
+    // background(0);
+    // Reset color values
+  counter+=1;
+   if (counter%4==1)
+   {
+      //light green
+        for (let i = 0; i < particles.length; i++) {
+          // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+          particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+          particles[i].updatePrev();
+
+      }
+      r = color_palette[2][0];
+      g = color_palette[2][1];
+      b = color_palette[2][2];
+   }
+   else if (counter%4==2)
+   {
+      //light blue
+        for (let i = 0; i < particles.length; i++) {
+          // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+          particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+          particles[i].updatePrev();
+      }
+      r = color_palette[1][0];
+      g = color_palette[1][1];
+      b = color_palette[1][2];
+   }
+   else if (counter%4==3)
+   {
+      //darkest blue
+        for (let i = 0; i < particles.length; i++) {
+          // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+          particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+          particles[i].updatePrev();
+      }
+      r = color_palette[0][0];
+      g = color_palette[0][1];
+      b = color_palette[0][2];
+   }
+   else 
+   {
+      //yellow
+        for (let i = 0; i < particles.length; i++) {
+          // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+          particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+          particles[i].updatePrev();
+      }
+      r = color_palette[3][0];
+      g = color_palette[3][1];
+      b = color_palette[3][2];
+   }
+    
+    
+}
