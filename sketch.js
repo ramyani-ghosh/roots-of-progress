@@ -15,8 +15,8 @@ function preload() {
   // Load the image
   // treeImg = loadImage('tree-black.png');
   
-  treeImg = loadImage('tree-model-1.png');
-  circleImg = loadImage('circlecanvas2.png');
+  treeImg = loadImage('images/tree-model-1.png');
+  circleImg = loadImage('images/circlecanvas2.png');
 }
 console.log("color_palette");
 console.log(color_palette);
@@ -55,7 +55,7 @@ class Particle {
       // Initial acceleration set to (0, 0)
       this.accel = createVector(0, 0);
       // Maximum speed that the particle can move
-      this.maxV = 5.5;
+      this.maxV = 3.5;
       // Store the previous position of the particle
       this.prevPos = this.pos.copy();
     }
