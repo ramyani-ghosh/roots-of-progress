@@ -55,7 +55,7 @@ class Particle {
       // Initial acceleration set to (0, 0)
       this.accel = createVector(0, 0);
       // Maximum speed that the particle can move
-      this.maxV = 3.5;
+      this.maxV = 4.5;
       // Store the previous position of the particle
       this.prevPos = this.pos.copy();
     }
@@ -88,19 +88,6 @@ class Particle {
     display() {
       // stroke(this.r, this.g, this.b);
       stroke(r, g, b);
-
-      //teal
-      // if (g%2==0)
-      // {
-      //   b-=0.10012;
-      //   g-=0.102;
-      //   r-=0.104;
-      // }
-      // else{
-      //   b+=0.0001;
-      //   g+=0.00005;
-      //   r+=0.00008;
-      // }  
 
       if ( b<200 && r<200 && g<200)
       {
