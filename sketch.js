@@ -1,10 +1,7 @@
-var heighthigh 
-var heightlow 
-var widthhigh
-var widthlow
-//color palettes = [ [darkblue, lightblue, lightgreen, yellow] , [purple, pink, orange, yellow] ]
-let color_palettes = [ [[30,56,90],[54,152,206],[132,162,70], [217,203,105]] , [[83, 43, 85],[215, 75, 118], [251, 109, 72], [255, 175, 69]] ]
-var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
+//SerialCode
+let serial;
+let latestData = "waiting for data"; 
+
 // Preload function to load external assets
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -21,30 +18,32 @@ function preload() {
 console.log("color_palette");
 console.log(color_palette);
 
-// Class for a particle that moves based on a perlin noise flow field
-// ...
+let start_rest = 1;
+let present_run = 0;
+let circle_transparency = 1;
+var heighthigh ;
+var heightlow ;
+var widthhigh;
+var widthlow;
+//color palettes = [ [darkblue, lightblue, lightgreen, yellow] , [purple, pink, orange, yellow] ]
+let color_palettes = [ [[30,106,187],[94,192,256],[132,162,70], [247,233,105]] , [[143, 43, 155],[100, 90, 198], [241, 99, 51], [255, 175, 69]] ];
+var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
+let sustainability_quotes = [ ["Plastics reduced 20%"] , ["Greener fuel 5%"] , ["Community outreach 30%"]];
+var sustainability_quote = "";
+let counter = -1;
 
-// function setup() {
-//   // create a canvas with width 1450 and height 820
-//   createCanvas(950, 820);
-//   // ...
-// }
-let counter = 0;
-// Class for a particle that moves based on a perlin noise flow field
-let r = color_palette[0][0];
-let g = color_palette[0][1];
-let b = color_palette[0][2];
+let r = 120;
+let g = 250;
+let b = 210;
+let maxV = 2.5;
+
+
+
 class Particle {
     constructor() {
-      // this.r = 20;
-      // this.g = 60;
-      // this.b = 60;
-      this.r = 30;
-      this.g = 56;
-      this.b = 90;
+      
       // Initial position of the particle at a random point on the canvas
-      // this.pos = createVector(random(width), random(0,10));
-      // this.pos = createVector(random(width/2-50,width/2+50), random(10,50));
+ 
       heighthigh = height/2+170;
       heightlow =  height/2+300;
       widthhigh = width/2+60;
@@ -55,7 +54,7 @@ class Particle {
       // Initial acceleration set to (0, 0)
       this.accel = createVector(0, 0);
       // Maximum speed that the particle can move
-      this.maxV = 4.5;
+      this.maxV = 5.5;
       // Store the previous position of the particle
       this.prevPos = this.pos.copy();
     }
@@ -77,7 +76,7 @@ class Particle {
       // Add the acceleration to the velocity
       this.vel.add(this.accel);
       // Limit the velocity to the maxV
-      this.vel.limit(this.maxV);
+      this.vel.limit(maxV);
       // Add the velocity to the position
       this.pos.add(this.vel);
       // Reset the acceleration to (0, 0)
@@ -86,17 +85,34 @@ class Particle {
   
     // Display the particle as a line connecting its current and previous position
     display() {
+      present_run+=0.001;
       // stroke(this.r, this.g, this.b);
       stroke(r, g, b);
-
-      if ( b<200 && r<200 && g<200)
+      if (start_rest)
+      {
+        circle_transparency = 100;
+      }
+      if (present_run >100)
+      {
+          circle_transparency+=0.0001; 
+          start_rest = 1;         
+      }
+      else{
+        strokeWeight(0.6);
+      }
+      if ( b<230 && r<230 && g<230)
       {
         b+=0.001;
         g+=0.001;
-        r+=0.001;
+        r+=0.001; 
+
+      }
+      if ( maxV > 1.5 )
+      {
+        maxV = maxV-0.000035;
       }
        
-      strokeWeight(0.4);
+     
       line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
       this.updatePrev();
     }
@@ -111,8 +127,8 @@ class Particle {
     particleReset() {
       let rightend = 1185
       let leftend = 310
-      let topend = 30
-      let bottomend = height-30
+      let topend = 40
+      let bottomend = height-40
       if (this.pos.x >= rightend) {
         this.pos.x = leftend;
         this.updatePrev();
@@ -159,14 +175,20 @@ class Particle {
   // reset variable is used for controlling the background reset
   let reset = 0;
   
-  // total number of times the program runs before resetting background
-  let resetTimes = 200000;
   
   // setup function is called once when the sketch starts
   function setup() {
     // create a canvas with width 600 and height 400
     w = document.body.scrollWidthl
     createCanvas(1450, 920);
+
+
+    //SerialCode
+    serial = new p5.SerialPort();
+    serial.list(); 
+    serial.open("COM3");
+    serial.on('connected', serverConnected); 
+    serial.on('data', serialEvent);
   
     // calculate the number of columns and rows in the canvas
     cols = floor(width / s);
@@ -176,7 +198,7 @@ class Particle {
     flowfield = new Array(cols * rows);
   
     // create 300 Particle objects and store them in the particles array
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 400; i++) {
       particles[i] = new Particle();
     }
   
@@ -184,11 +206,25 @@ class Particle {
     background(0);
   }
   
+  //SerialCode
+  function serverConnected() {
+    console.log('connected to server.');
+  }  
+  //read gotten serial event content and invole animation trigger
+  function serialEvent() {
+    let data = serial.readLine(); 
+    trim(data); 
+    if (!data) return; 
+    latestData = data; 
+    trigger(); 
+  
+  }
+
   // draw function is called repeatedly until the sketch stops
   function draw() {    
 
     // image(circleImg, width/2 - 890, height/2 - 420, 1650, 1020);
-    frameRate(30);
+    frameRate(40);
     // increment the reset variable
     reset++;
     // translate(width / 2, height / 2);
@@ -243,14 +279,41 @@ class Particle {
     }
     image(treeImg, width/2 - 230, height/2 - 300, 550, 700);
     image(circleImg, width/2 - 790, height/2 - 440, 1650, 1020);
+
+    fill(255);
+    textSize(32);
+    textAlign(CENTER, CENTER);
+    text(sustainability_quote, width/2, 40);
+
+    noStroke();
+    fill(0,circle_transparency);
+    circle(width/2+50, 0 , 30000);
+    
+  
   }
 
 // Function to handle mouse click event
+//SerialCode
+//function trigger() {
 function mousePressed() {
-    // Reset the background
-    // background(0);
-    // Reset color values
+  if (start_rest == 1)
+  {// Reset the background
+    background(0);
+  }
+  start_rest = 0;
+
+  console.log("When pressed, run is : ")
+  console.log(present_run);
+  present_run = 0;
+  circle_transparency = 0;
   counter+=1;
+  console.log("quote");
+  console.log (sustainability_quote);
+  console.log(counter%sustainability_quotes.length);
+  sustainability_quote = sustainability_quotes[ counter%sustainability_quotes.length ][0];
+  
+  
+  maxV = 4.5;
    if (counter%4==1)
    {
       //light green
@@ -276,7 +339,7 @@ function mousePressed() {
       g = color_palette[1][1];
       b = color_palette[1][2];
    }
-   else if (counter%4==3)
+   else if (counter%4==0)
    {
       //darkest blue
         for (let i = 0; i < particles.length; i++) {
