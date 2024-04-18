@@ -11,9 +11,10 @@ function getRandomInt(min, max) {
 function preload() {
   // Load the image
   // treeImg = loadImage('tree-black.png');
-  
+  fontItalic = loadFont("assets/PlayfairDisplay-MediumItalic.ttf");
+  fontItalic2 = loadFont("assets/Brygada1918-Italic.ttf");
   treeImg = loadImage('images/tree-model-1.png');
-  circleImg = loadImage('images/circlecanvas2.png');
+  circleImg = loadImage('images/circlecanvas3.png');
 }
 console.log("color_palette");
 console.log(color_palette);
@@ -25,10 +26,15 @@ var heighthigh ;
 var heightlow ;
 var widthhigh;
 var widthlow;
+var fade = 0;
+var fadeAmount = 2;
+// fuel, fleet, reuse reduce&recycle, community outreach
 //color palettes = [ [darkblue, lightblue, lightgreen, yellow] , [purple, pink, orange, yellow] ]
 let color_palettes = [ [[30,106,187],[94,192,256],[132,162,70], [247,233,105]] , [[143, 43, 155],[100, 90, 198], [241, 99, 51], [255, 175, 69]] ];
 var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
-let sustainability_quotes = [ ["Plastics reduced 20%"] , ["Greener fuel 5%"] , ["Community outreach 30%"]];
+let sustainability_quotes = [ ["We have started executing sustainable fuel agreements with corporate customers"] , 
+[" In 2022, we took delivery of 69 aircraft that were 25% more fuel efficient per seat mile than aircraft retired since 2019"] , 
+["Our onboard bedding made from 100% recycled plastic bottles and we offer reusable service ware"]];
 var sustainability_quote = "";
 let counter = -1;
 
@@ -44,10 +50,10 @@ class Particle {
       
       // Initial position of the particle at a random point on the canvas
  
-      heighthigh = height/2+170;
-      heightlow =  height/2+300;
-      widthhigh = width/2+60;
-      widthlow = width/2+50;
+      heighthigh = height/2+270;
+      heightlow =  height/2+370;
+      widthhigh = width/2+10;
+      widthlow = width/2-10;
       this.pos = createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
       // Initial velocity set to (0, 0)
       this.vel = createVector(0, 0);
@@ -92,7 +98,7 @@ class Particle {
       {
         circle_transparency = 100;
       }
-      if (present_run >100)
+      if (present_run >7000)
       {
           circle_transparency+=0.0001; 
           start_rest = 1;         
@@ -109,7 +115,7 @@ class Particle {
       }
       if ( maxV > 1.5 )
       {
-        maxV = maxV-0.000035;
+        maxV = maxV-0.000025;
       }
        
      
@@ -125,10 +131,10 @@ class Particle {
    
     // Check if the particle has gone outside the canvas and wrap it around if necessary
     particleReset() {
-      let rightend = 1185
-      let leftend = 310
-      let topend = 40
-      let bottomend = height-40
+      let rightend = 1180
+      let leftend = 305
+      let topend = 180
+      let bottomend = height
       if (this.pos.x >= rightend) {
         this.pos.x = leftend;
         this.updatePrev();
@@ -277,19 +283,26 @@ class Particle {
       // Call the display function to display the particle on the canvas.
       particles[i].display();
     }
-    image(treeImg, width/2 - 230, height/2 - 300, 550, 700);
-    image(circleImg, width/2 - 790, height/2 - 440, 1650, 1020);
+    // image(treeImg, width/2 - 270, height/2 - 210, 550, 700);
+    image(circleImg, width/2 - 830, height/2 - 510, 1650, 1020);
 
-    fill(255);
-    textSize(32);
+    fill(255,255,255,fade);
+    if (fade<0) fadeAmount=2; 
+    if (fade>=255) fadeAmount=0; 
+    fade += fadeAmount; 
+    console.log("fade: " + fade);
+    noStroke();
+    textSize(30);
+    textLeading(28);
+    textWrap(WORD);
     textAlign(CENTER, CENTER);
-    text(sustainability_quote, width/2, 40);
+    textFont(fontItalic2);
+    text(sustainability_quote, width/2-400, 0,800,200);
 
     noStroke();
     fill(0,circle_transparency);
     circle(width/2+50, 0 , 30000);
     
-  
   }
 
 // Function to handle mouse click event
@@ -312,8 +325,9 @@ function mousePressed() {
   console.log(counter%sustainability_quotes.length);
   sustainability_quote = sustainability_quotes[ counter%sustainability_quotes.length ][0];
   
-  
-  maxV = 4.5;
+  fade = 0;
+  fadeAmount = 2;
+  maxV = 5.5;
    if (counter%4==1)
    {
       //light green
