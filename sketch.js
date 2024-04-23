@@ -14,7 +14,7 @@ function preload() {
   fontItalic = loadFont("assets/PlayfairDisplay-MediumItalic.ttf");
   fontItalic2 = loadFont("assets/Brygada1918-Italic.ttf");
   treeImg = loadImage('images/tree-model-1.png');
-  circleImg = loadImage('images/circlecanvas3.png');
+  circleImg = loadImage('images/circlecanvasblur.png');
 }
 console.log("color_palette");
 console.log(color_palette);
@@ -28,16 +28,27 @@ var widthhigh;
 var widthlow;
 var fade = 0;
 var fadeAmount = 2;
-// fuel, fleet, reuse reduce&recycle, community outreach
-//color palettes = [ [darkblue, lightblue, lightgreen, yellow] , [purple, pink, orange, yellow] ]
-let color_palettes = [ [[30,106,187],[94,192,256],[132,162,70], [247,233,105]] , [[143, 43, 155],[100, 90, 198], [241, 99, 51], [255, 175, 69]] ];
-var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
-let sustainability_quotes = [ ["We have started executing sustainable fuel agreements with corporate customers"] , 
-[" In 2022, we took delivery of 69 aircraft that were 25% more fuel efficient per seat mile than aircraft retired since 2019"] , 
-["Our onboard bedding made from 100% recycled plastic bottles and we offer reusable service ware"]];
+// energy and fuel, fleet, reuse reduce&recycle, community outreach
+//color palettes = [ [darkblue, yellow, lightgreen, lightblue] , [purple, pink, orange, yellow] ]
+let color_palettes = [ [[4,56,127],[217,173,75],[62,102,30], [104,182,246]] , [[143, 43, 155],[100, 90, 198], [241, 99, 51], [255, 175, 69]] ];
+// var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
+var color_palette =  color_palettes [0];
+let sustainability_quotes = [ 
+["We are testing a new paper cup which will eliminate approximately 7 million pounds of single-use-plastic",20,3],
+["Delta Premium Offerings include artisan-made amenity kits from Certified B Corporation apparel brand Someone Somewhere",100,4],
+["In 2022, we took delivery of 69 aircraft that were 25% more fuel efficient per seat mile than aircraft retired since 2019",50,2] , 
+["We have started executing sustainable fuel agreements with corporate customers",20,1] , 
+["Our onboard bedding is made from 100% recycled plastic bottles and we offer reusable service ware",100,3],
+["Delta hosted the Sustainable Flight Challenge showcase at the Delta Flight Museum in October, 2023",60,4],
+["Joby, Delta’s electric, vertical takeoff and landing (eVTOL) partner, successfully performed test flights in New York City",20,2],
+["Core ground support equipment at Salt Lake City and Boston are nearly entirely powered with electricity",65,1],
+["We stopped automatically printing pre-departure documents, saving more than 70 million pages per year or 4,000 trees",100,3]
+
+];
 var sustainability_quote = "";
 let counter = -1;
 
+var textleft = 80;
 let r = 120;
 let g = 250;
 let b = 210;
@@ -50,10 +61,10 @@ class Particle {
       
       // Initial position of the particle at a random point on the canvas
  
-      heighthigh = height/2+270;
-      heightlow =  height/2+370;
-      widthhigh = width/2+10;
-      widthlow = width/2-10;
+      heighthigh = height/2+70;
+      heightlow =  height/2+170;
+      widthhigh = width/2-55;
+      widthlow = width/2-65;
       this.pos = createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
       // Initial velocity set to (0, 0)
       this.vel = createVector(0, 0);
@@ -97,8 +108,9 @@ class Particle {
       if (start_rest)
       {
         circle_transparency = 100;
+        sustainability_quote="";
       }
-      if (present_run >7000)
+      if (present_run >300)
       {
           circle_transparency+=0.0001; 
           start_rest = 1;         
@@ -108,14 +120,14 @@ class Particle {
       }
       if ( b<230 && r<230 && g<230)
       {
-        b+=0.001;
-        g+=0.001;
+        b+=0.002;
+        g+=0.002;
         r+=0.001; 
 
       }
-      if ( maxV > 1.5 )
+      if ( maxV > 2.0 )
       {
-        maxV = maxV-0.000025;
+        maxV = maxV-0.000015;
       }
        
      
@@ -131,10 +143,21 @@ class Particle {
    
     // Check if the particle has gone outside the canvas and wrap it around if necessary
     particleReset() {
-      let rightend = 1180
-      let leftend = 305
-      let topend = 180
-      let bottomend = height
+      // let rightend = 1180
+      // let leftend = 305
+      // let topend = 175
+      // let bottomend = height
+
+      // let rightend = 1125
+      // let leftend = 330
+      // let topend = 66
+      // let bottomend = height-80
+
+
+      let rightend = 1125
+      let leftend = 270
+      let topend = 0
+      let bottomend = height-220
       if (this.pos.x >= rightend) {
         this.pos.x = leftend;
         this.updatePrev();
@@ -204,7 +227,7 @@ class Particle {
     flowfield = new Array(cols * rows);
   
     // create 300 Particle objects and store them in the particles array
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < 300; i++) {
       particles[i] = new Particle();
     }
   
@@ -222,7 +245,11 @@ class Particle {
     trim(data); 
     if (!data) return; 
     latestData = data; 
-    trigger(); 
+    if (latestData == "touch")
+    {
+      trigger(); 
+    }
+    
   
   }
 
@@ -284,20 +311,20 @@ class Particle {
       particles[i].display();
     }
     // image(treeImg, width/2 - 270, height/2 - 210, 550, 700);
-    image(circleImg, width/2 - 830, height/2 - 510, 1650, 1020);
+    image(circleImg, width/2 - 770, height/2 - 470, 1450, 920);
 
     fill(255,255,255,fade);
     if (fade<0) fadeAmount=2; 
     if (fade>=255) fadeAmount=0; 
     fade += fadeAmount; 
-    console.log("fade: " + fade);
     noStroke();
-    textSize(30);
-    textLeading(28);
+    textSize(24);
+    textLeading(23);
     textWrap(WORD);
-    textAlign(CENTER, CENTER);
+    textAlign(CENTER, BOTTOM);
     textFont(fontItalic2);
-    text(sustainability_quote, width/2-400, 0,800,200);
+    // text(sustainability_quote, width/2-400, 0,800,200);
+    text(sustainability_quote, textleft, 480,250,300)
 
     noStroke();
     fill(0,circle_transparency);
@@ -307,16 +334,22 @@ class Particle {
 
 // Function to handle mouse click event
 //SerialCode
-//function trigger() {
-function mousePressed() {
+function trigger() {
+// function mousePressed() {
   if (start_rest == 1)
   {// Reset the background
     background(0);
   }
   start_rest = 0;
+  fade = 0;
+  fadeAmount = 2;
 
   console.log("When pressed, run is : ")
+
+
+
   console.log(present_run);
+
   present_run = 0;
   circle_transparency = 0;
   counter+=1;
@@ -324,11 +357,32 @@ function mousePressed() {
   console.log (sustainability_quote);
   console.log(counter%sustainability_quotes.length);
   sustainability_quote = sustainability_quotes[ counter%sustainability_quotes.length ][0];
+  var progress= sustainability_quotes[ counter%sustainability_quotes.length ][1];
+  var initiative = sustainability_quotes[ counter%sustainability_quotes.length ][2];
+  console.log("intiative" + initiative);
+  if(progress<33)
+  {
+    maxV = 3.0;
+  }
+  else if(progress<75)
+  {
+    maxV = 4.5;
+  }
+  else{
+    maxV = 5.5;
+  }
+  maxV+=2;
+
+  if (counter%2==0)
+  {
+      textleft= 250;
+  }
+  else
+  {
+    textleft= 860;
+  }
   
-  fade = 0;
-  fadeAmount = 2;
-  maxV = 5.5;
-   if (counter%4==1)
+   if (initiative==3)
    {
       //light green
         for (let i = 0; i < particles.length; i++) {
@@ -341,7 +395,7 @@ function mousePressed() {
       g = color_palette[2][1];
       b = color_palette[2][2];
    }
-   else if (counter%4==2)
+   else if (initiative==2)
    {
       //light blue
         for (let i = 0; i < particles.length; i++) {
@@ -353,7 +407,7 @@ function mousePressed() {
       g = color_palette[1][1];
       b = color_palette[1][2];
    }
-   else if (counter%4==0)
+   else if (initiative==1)
    {
       //darkest blue
         for (let i = 0; i < particles.length; i++) {
