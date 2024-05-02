@@ -1,6 +1,7 @@
 //SerialCode
 let serial;
 let latestData = "waiting for data"; 
+let oldData = "Untouched";
 
 // Preload function to load external assets
 function getRandomInt(min, max) {
@@ -30,19 +31,37 @@ var fade = 0;
 var fadeAmount = 2;
 // energy and fuel, fleet, reuse reduce&recycle, community outreach
 //color palettes = [ [darkblue, yellow, lightgreen, lightblue] , [purple, pink, orange, yellow] ]
-let color_palettes = [ [[4,56,127],[217,173,75],[62,102,30], [104,182,246]] , [[143, 43, 155],[100, 90, 198], [241, 99, 51], [255, 175, 69]] ];
+let color_palettes = [ [[4,56,127],[217,173,75],[62,102,30], [54,152,196]] , [[143, 43, 155],[100, 90, 198], [241, 99, 51], [255, 175, 69]] ];
 // var color_palette = color_palettes[getRandomInt(0,color_palettes.length-1)];
 var color_palette =  color_palettes [0];
-let sustainability_quotes = [ 
-["We are testing a new paper cup which will eliminate approximately 7 million pounds of single-use-plastic",20,3],
-["Delta Premium Offerings include artisan-made amenity kits from Certified B Corporation apparel brand Someone Somewhere",100,4],
-["In 2022, we took delivery of 69 aircraft that were 25% more fuel efficient per seat mile than aircraft retired since 2019",50,2] , 
-["We have started executing sustainable fuel agreements with corporate customers",20,1] , 
-["Our onboard bedding is made from 100% recycled plastic bottles and we offer reusable service ware",100,3],
-["Delta hosted the Sustainable Flight Challenge showcase at the Delta Flight Museum in October, 2023",60,4],
-["Joby, Delta’s electric, vertical takeoff and landing (eVTOL) partner, successfully performed test flights in New York City",20,2],
-["Core ground support equipment at Salt Lake City and Boston are nearly entirely powered with electricity",65,1],
-["We stopped automatically printing pre-departure documents, saving more than 70 million pages per year or 4,000 trees",100,3]
+// let sustainability_quotes = [ 
+// ["We are testing a new paper cup which will eliminate approximately 7 million pounds of single-use-plastic",20,3],
+// ["Delta Premium Offerings include artisan-made amenity kits from Certified B Corporation apparel brand Someone Somewhere",100,4],
+// ["In 2022, we took delivery of 69 aircraft that were 25% more fuel efficient per seat mile than aircraft retired since 2019",50,2] , 
+// ["We have started executing sustainable fuel agreements with corporate customers",20,1] , 
+// ["Our onboard bedding is made from 100% recycled plastic bottles and we offer reusable service ware",100,3],
+// ["Delta hosted the Sustainable Flight Challenge showcase at the Delta Flight Museum in October, 2023",60,4],
+// ["Joby, Delta’s electric, vertical takeoff and landing (eVTOL) partner, successfully performed test flights in New York City",20,2],
+// ["Core ground support equipment at Salt Lake City and Boston are nearly entirely powered with electricity",65,1],
+// ["We stopped automatically printing pre-departure documents, saving more than 70 million pages per year or 4,000 trees",100,3]
+
+// ];
+
+
+
+let sustainability_quotes = [
+  ["Progress made:\nDelta offset 13M metric tons of emissions from operations in 2020- equivalent to 17M forest acres, covering all of West Virginia!",80,1],
+  ["Now in progress:\n98% of emissions come from the fleet itself -Delta fleet renewal is expected in full by 2035",20,2],
+  ["Progress made:\nCore ground support equipment at Salt Lake City and Boston are 100% powered with electricity!",80,1],
+  ["Our goal now:\nWe aim to transition all hubs to 100% electric-based by 2035.",20,4],
+  ["Progress made:\nWe stopped automatically printing pre-departure documents, saving more than 70 million pages per year or 4,000 trees",80,3],
+  ["What's next?\nContinue community contributions such as planting trees and supporting LEAF (Lowering Emissions by Accelerating Forest Finance) Coalition.",20,4],
+  ["Progress made:\n We took delivery of 69 aircrafts that were 25% more fuel efficient per seat mile than aircraft retired since 2019",80,2],
+  ["Upcoming:\n Joby, Delta’s electric, vertical takeoff and landing (eVTOL) partner, successfully performed test flights in New York City", 20, 2],
+  ["Progress made:\nWe’ve reduced annual plastic use by 2.4M pounds by introducing bamboo cutlery and using 100% recycled polyester bedding.",80,3],
+  ["What now?\nWe're finding more plastic to swap out with recyclable or compostable items such as biodegradable cups.",20,3],
+  ["Progress made:\nDelta Premium Offerings include artisan-made amenity kits from Certified B Corporation apparel brand Someone Somewhere",80,4],
+  ["What we're doing now:\n We have started executing sustainable fuel agreements with corporate customers",20,1]
 
 ];
 var sustainability_quote = "";
@@ -61,8 +80,8 @@ class Particle {
       
       // Initial position of the particle at a random point on the canvas
  
-      heighthigh = height/2+70;
-      heightlow =  height/2+170;
+      heighthigh = height/2+190;
+      heightlow =  height/2+260;
       widthhigh = width/2-55;
       widthlow = width/2-65;
       this.pos = createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
@@ -110,7 +129,7 @@ class Particle {
         circle_transparency = 100;
         sustainability_quote="";
       }
-      if (present_run >300)
+      if (present_run >400)
       {
           circle_transparency+=0.0001; 
           start_rest = 1;         
@@ -125,11 +144,11 @@ class Particle {
         r+=0.001; 
 
       }
-      if ( maxV > 2.0 )
-      {
-        maxV = maxV-0.000015;
-      }
-       
+      // if ( maxV > 1.5 )
+      // {
+      //   maxV = maxV-0.000015;
+      // }
+     
      
       line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
       this.updatePrev();
@@ -227,7 +246,7 @@ class Particle {
     flowfield = new Array(cols * rows);
   
     // create 300 Particle objects and store them in the particles array
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 200; i++) {
       particles[i] = new Particle();
     }
   
@@ -245,9 +264,13 @@ class Particle {
     trim(data); 
     if (!data) return; 
     latestData = data; 
-    if (latestData == "touch")
+    if (latestData == "touch" && oldData == "Untouched")
     {
       trigger(); 
+      oldData = "Touched";
+    }
+    else if(latestData =="Untouched"){
+      oldData = "Untouched";
     }
     
   
@@ -318,8 +341,8 @@ class Particle {
     if (fade>=255) fadeAmount=0; 
     fade += fadeAmount; 
     noStroke();
-    textSize(24);
-    textLeading(23);
+    textSize(22);
+    textLeading(22);
     textWrap(WORD);
     textAlign(CENTER, BOTTOM);
     textFont(fontItalic2);
@@ -334,8 +357,8 @@ class Particle {
 
 // Function to handle mouse click event
 //SerialCode
-function trigger() {
-// function mousePressed() {
+// function trigger() {
+function mousePressed() {
   if (start_rest == 1)
   {// Reset the background
     background(0);
@@ -362,16 +385,16 @@ function trigger() {
   console.log("intiative" + initiative);
   if(progress<33)
   {
-    maxV = 3.0;
+    maxV = 2.0;
   }
   else if(progress<75)
   {
-    maxV = 4.5;
+    maxV = 3.5;
   }
   else{
-    maxV = 5.5;
+    maxV = 4.5;
   }
-  maxV+=2;
+  maxV+=0;
 
   if (counter%2==0)
   {
@@ -379,7 +402,7 @@ function trigger() {
   }
   else
   {
-    textleft= 860;
+    textleft= 866;
   }
   
    if (initiative==3)
@@ -434,3 +457,106 @@ function trigger() {
     
     
 }
+
+
+function trigger() {
+  // function mousePressed() {
+    if (start_rest == 1)
+    {// Reset the background
+      background(0);
+    }
+    start_rest = 0;
+    fade = 0;
+    fadeAmount = 2;
+  
+    console.log("When pressed, run is : ")
+  
+  
+  
+    console.log(present_run);
+  
+    present_run = 0;
+    circle_transparency = 0;
+    counter+=1;
+    console.log("quote");
+    console.log (sustainability_quote);
+    console.log(counter%sustainability_quotes.length);
+    sustainability_quote = sustainability_quotes[ counter%sustainability_quotes.length ][0];
+    var progress= sustainability_quotes[ counter%sustainability_quotes.length ][1];
+    var initiative = sustainability_quotes[ counter%sustainability_quotes.length ][2];
+    console.log("intiative" + initiative);
+    if(progress<33)
+    {
+      maxV = 2.5;
+    }
+    else if(progress<75)
+    {
+      maxV = 3.2;
+    }
+    else{
+      maxV = 4.0;
+    }
+    maxV+=0;
+  
+    if (counter%2==0)
+    {
+        textleft= 250;
+    }
+    else
+    {
+      textleft= 860;
+    }
+    
+     if (initiative==3)
+     {
+        //light green
+          for (let i = 0; i < particles.length; i++) {
+            // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+            particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+            particles[i].updatePrev();
+  
+        }
+        r = color_palette[2][0];
+        g = color_palette[2][1];
+        b = color_palette[2][2];
+     }
+     else if (initiative==2)
+     {
+        //light blue
+          for (let i = 0; i < particles.length; i++) {
+            // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+            particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+            particles[i].updatePrev();
+        }
+        r = color_palette[1][0];
+        g = color_palette[1][1];
+        b = color_palette[1][2];
+     }
+     else if (initiative==1)
+     {
+        //darkest blue
+          for (let i = 0; i < particles.length; i++) {
+            // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+            particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+            particles[i].updatePrev();
+        }
+        r = color_palette[0][0];
+        g = color_palette[0][1];
+        b = color_palette[0][2];
+     }
+     else 
+     {
+        //yellow
+          for (let i = 0; i < particles.length; i++) {
+            // particles[i].pos = createVector(random(width/2-50,width/2+50), random(height/2,height/2+60));
+            particles[i].pos=createVector(random(widthlow,widthhigh), random(heightlow,heighthigh));
+            particles[i].updatePrev();
+        }
+        r = color_palette[3][0];
+        g = color_palette[3][1];
+        b = color_palette[3][2];
+     }
+      
+      
+  }
+  
